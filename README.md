@@ -22,7 +22,7 @@ Nome: Daniel Dias Ramos
 
 
  
-2-	Criar as tabelas para importar os dados do Excel. Nesse ponto basta colar os scripts enviados na estrutura de como os dados devem ser inseridos
+2-	Criar as tabelas para importar os dados do Excel. Nesse ponto realizei alguns ajustes nos scripts que apontavam os erros que deixarei logo abaixo neste documento.
 O exemplo abaixo faço com o primeiro script, os demais são feitos da mesma forma
  
 <img width="886" height="965" alt="image" src="https://github.com/user-attachments/assets/9fd6966c-a38f-4bc4-b1f6-74abe0c928db" />
@@ -63,16 +63,20 @@ Parte 2 – Consultas SQL Básicas
 --em quantidade e em valores (R$), de cada produto,
 --no mês de fevereiro de 2025.
 
-select produto_id ,qtde_vendida ,'R$ '||TRUNC((qtde_vendida * valor_unitario)::numeric,2) as TOTAL_VENDA 
+select produto_id ,qtde_vendida, 
+'R$ '||TRUNC((qtde_vendida * valor_unitario)::numeric,2) as TOTAL_VENDA,
+produtos_filial.descricao 
 from VENDA
+left join produtos_filial on (venda.produto_id = produtos_filial.idproduto)
 where data_emissao between '01/02/2025' and '28/02/2025';
 
-<img width="886" height="225" alt="image" src="https://github.com/user-attachments/assets/60ddc3d6-c191-42c1-aede-741200c794b0" />
+<img width="573" height="295" alt="image" src="https://github.com/user-attachments/assets/0487c6ac-7532-4789-ad49-9c9ec8866235" />
+
 
  
 
 obs: no banco postgre o resultado da busca se tornou do tipo double por devido a declaração dos dados, para não alterar a declaração adicionei a função ::numeric para na hora de truncar ele já entender que os dados que estou buscando são numéricos e conseguir executar a pesquisa.
- 	Optei por não fazer o Join com a tabela de produtos_filial pois ela só traz 20 produtos e a tabela de venda tem 28, mesmo que fizesse Left Join ficariam produtos sem descrição o que não seria o ideal.
+ 	A principio otei por não fazer o Join com a tabela de produtos_filial pois ela só traz 20 produtos e a tabela de venda tem 28, mesmo que fizesse Left Join ficariam produtos sem descrição o que não seria o ideal. Mas como no teste que fiz o produto em questão tinha correspondência na outra tabela acabei deixando na consulta
 
 --Crie uma consulta para listar os produtos que foram requisitados, mas não recebidos.
 
@@ -216,5 +220,21 @@ Select f.* from produtos_filial f where f.produto_id = ;
 Select f.* from pedido_compra f where f.pedido_id =  ; 
 
 Select f.* from venda f where f.venda_id = ; 
+
+Backup do Banco:
+<img width="836" height="846" alt="image" src="https://github.com/user-attachments/assets/e032fd60-a5f0-4ac4-b276-5f0262c86ebe" />
+
+Considerações finais:
+
+Como considerações finais tenho apenas sobre a tabela de pedido_compra:
+<img width="741" height="237" alt="image" src="https://github.com/user-attachments/assets/49ab38a0-a23d-4209-b480-215d30699292" />
+
+No final da mesma existem alguns campos que se assemelham aos campos já existentes na tabela, tentei realizar o de/para de cada campo, porém ele não chegou em uma combição precisa de que campo pertence a qual coluna. Caso tivesse o valor de cada produto poderia ainda fazer o calculo baseado no preco_compra e conseguiria chegar na quantidade entregue. Ainda assim restaria um campo sem sua informação precisa. Dito isso decidi não importar as informações visto que em um cenário de consultoria real eu não poderia "advinhar" o campo, os dados devem ser precisos visando a acertividade do cliente. Ainda levando em conta esse cenário eu validaria diretamente com a pessoa chave do projeto o que ele quis dizer com a informação passada no excel primeiro para não poluir o ambiente de produção do cliente.
+
+
+
+
+Agradeço a atenção nesse desafio e foi uma honra participar do mesmo!!🤩🚀
+
 
 
